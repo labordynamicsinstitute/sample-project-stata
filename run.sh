@@ -5,7 +5,13 @@ then
   echo "You need to specify the name of Stata license file as an argument"
   exit 2
 fi
-STATALIC=$(readlink -m $1)
+if [[ "$(uname)" == "Linux" ]]
+then
+  STATALIC=$(readlink -m $1)
+else
+  # might not work on other systems
+  STATALIC=$1
+fi
 
 if [[ ! -f $STATALIC ]] 
 then
@@ -39,8 +45,8 @@ set -ev
 if [[ $CI ]] 
 then
    DOCKEROPTS="--rm"
-   DOCKERIMG=$(echo $GITHUB_REPOSITORY | tr [A-Z] [a-z])
-   TAG=latest
+   source $configfile
+   DOCKERIMG=$MYHUBID/$MYIMG
 else
    DOCKEROPTS="-it --rm"
    source $configfile
